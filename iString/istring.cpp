@@ -1,8 +1,4 @@
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
 #include <iostream>
-#include <string>
 #include "istring.h"
 
 size_t* next(const char* s);
