@@ -30,11 +30,13 @@ public:
     String& operator=(const String&);
     bool operator==(const String&) const;
     bool operator!=(const String&) const;
-    char& operator[](size_t i) const;
+    const char& operator[](size_t i) const;
     String operator+(const String&) const;
     String operator*(const size_t) const;
 
     size_t length() const;
+    char* _data() const;
+    bool empty() const;
 
     long long find(const char) const;
     long long find(const char*) const;
@@ -44,12 +46,21 @@ public:
     std::vector<String> split(const char*) const;
     std::vector<String> split(const String&) const;
 
+    String cut(const size_t, const size_t) const;
+
     String join(const std::vector<String>&) const;
 
     String replace(const String&, const String&) const;
     String lower() const;
     String upper() const;
     String capitalize() const;
+
+    int toint() const;
+    long tolong() const;
+    long long tolonglong() const;
+    unsigned int touint() const;
+    unsigned long toulong() const;
+    unsigned long long toulonglong() const;
 };
 
 std::ostream& operator<<(std::ostream&, const String&);

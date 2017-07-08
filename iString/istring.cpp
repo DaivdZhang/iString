@@ -3,7 +3,6 @@
 
 size_t* next(const char* s);
 
-
 String::String()
 {
     _length = 0;
@@ -57,7 +56,7 @@ String::String(size_t n, const char* s)
 
 
 String::~String()
-{
+{   
     delete[] _str;
 }
 
@@ -101,7 +100,7 @@ bool String::operator!=(const String& s) const
 }
 
 
-char& String::operator[](size_t i) const
+const char& String::operator[](size_t i) const
 {
     return _str[i];
 }
@@ -141,6 +140,18 @@ String String::operator*(const size_t n) const
 size_t String::length() const
 {
     return _length;
+}
+
+
+char * String::_data() const
+{
+    return _str;
+}
+
+
+bool String::empty() const
+{
+    return _length ? true : false;
 }
 
 
@@ -278,6 +289,16 @@ std::vector<String> String::split(const String& s) const
 }
 
 
+String String::cut(const size_t begin, const size_t end) const
+{
+    auto str = new char[end - begin + 1]{'\0'};
+    strncpy_s(str, end - begin + 1, _str + begin, end - begin);
+    auto _ =  String(str);
+    delete[] str;
+    return _;
+}
+
+
 String String::join(const std::vector<String>& vec) const
 {
     String _s;
@@ -346,6 +367,77 @@ String String::capitalize() const
     }
 }
 
+template<class T>
+T to_integer(const String& s)
+{
+    unsigned int w = 1;
+    T num = 0;
+    
+    for(auto c =  s._data() + s.length() - 1; c != s._data() - 1; c--)
+    {
+        switch(*c)
+        {
+            case '0': break;
+            case '1': num += w; break;
+            case '2': num += w * 2; break;
+            case '3': num += w * 3; break;
+            case '4': num += w * 4; break;
+            case '5': num += w * 5; break;
+            case '6': num += w * 6; break;
+            case '7': num += w * 7; break;
+            case '8': num += w * 8; break;
+            case '9': num += w * 9; break;
+            case '-':
+            {
+                if(c == s._data())
+                    num = 0 - num;
+                else
+                    exit(1);
+            }
+            break;
+            default: std::cout << "unexpected char" << std::endl; exit(1);
+        }
+        w *= 10;
+    }
+    return num;
+}
+
+
+int String::toint() const
+{   
+    return to_integer<int>(*this);
+}
+
+
+long String::tolong() const
+{
+    return to_integer<long>(*this);
+}
+
+
+long long String::tolonglong() const
+{
+    return to_integer<long long>(*this);
+}
+
+
+unsigned int String::touint() const
+{
+    return to_integer<unsigned int>(*this);
+}
+
+
+unsigned long String::toulong() const
+{
+    return to_integer<unsigned long>(*this);
+}
+
+
+unsigned long long String::toulonglong() const
+{
+    return to_integer<unsigned long long>(*this);
+}
+
 
 std::ostream& operator<<(std::ostream& out, const String& s)
 {
@@ -354,7 +446,7 @@ std::ostream& operator<<(std::ostream& out, const String& s)
 }
 
 
-std::istream& operator >> (std::istream& in, String& s)
+std::istream& operator>>(std::istream& in, String& s)
 {
     char _s[256] = {0};
     in >> _s;
