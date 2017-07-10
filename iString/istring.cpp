@@ -1,6 +1,8 @@
 #include <iostream>
 #include "istring.h"
 
+using namespace istring;
+
 size_t* next(const char* s);
 
 String::String()
@@ -367,13 +369,14 @@ String String::capitalize() const
     }
 }
 
+
 template<class T>
 T to_integer(const String& s)
 {
     unsigned int w = 1;
     T num = 0;
-    
-    for(auto c =  s._data() + s.length() - 1; c != s._data() - 1; c--)
+
+    for(auto c = s._data() + s.length() - 1; c != s._data() - 1; c--)
     {
         switch(*c)
         {
@@ -439,14 +442,21 @@ unsigned long long String::toulonglong() const
 }
 
 
-std::ostream& operator<<(std::ostream& out, const String& s)
+String istring::operator+(const char* s1, const String& s2)
+{
+    auto _s = String(s1);
+    return s2 + _s;
+}
+
+
+std::ostream& istring::operator<<(std::ostream& out, const String& s)
 {
     out << s._str;
     return out;
 }
 
 
-std::istream& operator>>(std::istream& in, String& s)
+std::istream& istring::operator>>(std::istream& in, String& s)
 {
     char _s[256] = {0};
     in >> _s;
