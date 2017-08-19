@@ -88,7 +88,7 @@ String& String::operator=(const String& s)
 }
 
 
-String & istring::String::operator=(String&& s)
+String& istring::String::operator=(String&& s)
 {
     if(&s != this)
     {

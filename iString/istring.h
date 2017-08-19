@@ -26,7 +26,7 @@ namespace istring
         ~String();
 
         String& operator=(const String&);
-        String & operator=(String&&);
+        String& operator=(String&&);
         bool operator==(const String&) const;
         bool operator!=(const String&) const;
         const char& operator[](size_t i) const;
