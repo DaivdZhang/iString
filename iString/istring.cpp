@@ -36,6 +36,15 @@ String::String(const String& s)
 }
 
 
+String::String(String&& s)
+{
+    _str = s._str;
+    _length = s._length;
+    s._str = nullptr;
+    s._length = 0;
+}
+
+
 String::String(size_t n, const char c)
 {
     _length = n;
@@ -58,7 +67,7 @@ String::String(size_t n, const char* s)
 
 
 String::~String()
-{   
+{
     delete[] _str;
 }
 
@@ -74,6 +83,21 @@ String& String::operator=(const String& s)
 
         _str = new char[_length + 1];
         strcpy_s(_str, _length + 1, s._str);
+    }
+    return *this;
+}
+
+
+String & istring::String::operator=(String&& s)
+{
+    if(&s != this)
+    {
+        if(_str)
+            delete[] _str;
+        _str = s._str;
+        _length = s._length;
+        s._str = nullptr;
+        s._length = 0;
     }
     return *this;
 }
@@ -295,7 +319,7 @@ String String::cut(const size_t begin, const size_t end) const
 {
     auto str = new char[end - begin + 1]{'\0'};
     strncpy_s(str, end - begin + 1, _str + begin, end - begin);
-    auto _ =  String(str);
+    auto _ = String(str);
     delete[] str;
     return _;
 }
@@ -407,7 +431,7 @@ T to_integer(const String& s)
 
 
 int String::toint() const
-{   
+{
     return to_integer<int>(*this);
 }
 
@@ -442,6 +466,53 @@ unsigned long long String::toulonglong() const
 }
 
 
+template<class T>
+T to_float(const String& s)
+{
+    auto vec = s.split('.');
+    if(vec.size() == 0)
+        return to_integer<T>(s);
+    else if(vec.size() != 2)
+        exit(1);
+
+    auto a = to_integer<T>(vec[0]);
+    T b = 0;
+    T w = vec[0][0] != '-' ? static_cast<T>(0.1) : static_cast<T>(-0.1);
+
+    for(auto c = vec[1]._data(); c != vec[1]._data() + vec[1].length(); c++)
+    {
+        switch(*c)
+        {
+            case '0': break;
+            case '1': b += w; break;
+            case '2': b += w * 2; break;
+            case '3': b += w * 3; break;
+            case '4': b += w * 4; break;
+            case '5': b += w * 5; break;
+            case '6': b += w * 6; break;
+            case '7': b += w * 7; break;
+            case '8': b += w * 8; break;
+            case '9': b += w * 9; break;
+            default: std::cout << "unexpected char" << std::endl; exit(1);
+        }
+        w *= static_cast<T>(0.1);
+    }
+    return a + b;
+}
+
+
+float String::tofloat() const
+{
+    return to_float<float>(*this);
+}
+
+
+double String::todouble() const
+{
+    return to_float<double>(*this);
+}
+
+
 String istring::operator+(const char* s1, const String& s2)
 {
     auto _s = String(s1);
@@ -458,17 +529,15 @@ std::ostream& istring::operator<<(std::ostream& out, const String& s)
 
 std::istream& istring::operator>>(std::istream& in, String& s)
 {
-    char _s[256] = {0};
-    in >> _s;
-    s._length = strlen(_s);
+    char _s[256] = {'\0'};
+    in.getline(_s, 256);
 
-    if(!s._str)
-        s._str = new char[strlen(_s) + 1];
-    else
-    {
-        delete[] s._str;
-        s._str = new char[strlen(_s) + 1];
-    }
+    if(s._str == nullptr)
+        exit(14);
+
+    s._length = strlen(_s);
+    delete[] s._str;
+    s._str = new char[s._length + 1];
     strcpy_s(s._str, s._length + 1, _s);
 
     return in;

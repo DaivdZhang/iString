@@ -20,11 +20,13 @@ namespace istring
         String(const char);
         String(const char*);
         String(const String&);
+        String(String&&);
         String(size_t, const char);
         String(size_t, const char*);
         ~String();
 
         String& operator=(const String&);
+        String & operator=(String&&);
         bool operator==(const String&) const;
         bool operator!=(const String&) const;
         const char& operator[](size_t i) const;
@@ -58,6 +60,8 @@ namespace istring
         unsigned int touint() const;
         unsigned long toulong() const;
         unsigned long long toulonglong() const;
+        float tofloat() const;
+        double todouble() const;
     };
 
     String operator+(const char*, const String&);
