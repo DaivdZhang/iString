@@ -49,8 +49,7 @@ String::String(size_t n, const char c)
 {
     _length = n;
     _str = new char[_length + 1]{c};
-    if(!_str)
-        exit(14);
+    CHECK_MEM_ALLOC(_str);
     _str[_length] = '\0';
 }
 
@@ -59,8 +58,7 @@ String::String(size_t n, const char* s)
 {
     _length = n*strlen(s);
     _str = new char[_length + 1]{'\0'};
-    if(!_str)
-        exit(14);
+    CHECK_MEM_ALLOC(_str);
     for(size_t i = 0; i < n; i++)
         strcat_s(_str, _length + 1, s);
 }
@@ -68,6 +66,8 @@ String::String(size_t n, const char* s)
 
 String::~String()
 {
+    memset(_str, 0, _length + 1);
+    _length = 0;
     delete[] _str;
 }
 
@@ -132,19 +132,6 @@ const char& String::operator[](size_t i) const
 }
 
 
-String String::operator+(const String& s) const
-{
-    char* _s = new char[s._length + _length + 1]{'\0'};
-    if(!_s)
-        exit(14);
-    strcpy_s(_s, _length + 1, _str);
-    strcat_s(_s, _length + s._length + 1, s._str);
-    String _(_s);
-    delete[] _s;
-    return _;
-}
-
-
 String String::operator*(const size_t n) const
 {
     if(!n)
@@ -152,8 +139,7 @@ String String::operator*(const size_t n) const
     else
     {
         char* _s = new char[_length*n + 1]{'\0'};
-        if(!_s)
-            exit(14);
+        CHECK_MEM_ALLOC(_s);
         for(size_t i = 0; i < n; i++)
             strcat_s(_s, _length*n + 1, _str);
         String _(_s);
@@ -163,13 +149,26 @@ String String::operator*(const size_t n) const
 }
 
 
+String& istring::String::operator+=(const String& s)
+{
+    auto new_str = new char[_length + s._length + 1]{'\0'};
+    strcpy_s(new_str, _length + s._length + 1, _str);
+    strcat_s(new_str, _length + s._length + 1, s._str);
+    
+    if(_str)
+        delete[] _str;
+    this->_str = new_str;
+    return *this;
+}
+
+
 size_t String::length() const
 {
     return _length;
 }
 
 
-char * String::_data() const
+const char* String::c_str() const
 {
     return _str;
 }
@@ -394,129 +393,60 @@ String String::capitalize() const
 }
 
 
-template<class T>
-T to_integer(const String& s)
-{
-    unsigned int w = 1;
-    T num = 0;
-
-    for(auto c = s._data() + s.length() - 1; c != s._data() - 1; c--)
-    {
-        switch(*c)
-        {
-            case '0': break;
-            case '1': num += w; break;
-            case '2': num += w * 2; break;
-            case '3': num += w * 3; break;
-            case '4': num += w * 4; break;
-            case '5': num += w * 5; break;
-            case '6': num += w * 6; break;
-            case '7': num += w * 7; break;
-            case '8': num += w * 8; break;
-            case '9': num += w * 9; break;
-            case '-':
-            {
-                if(c == s._data())
-                    num = 0 - num;
-                else
-                    exit(1);
-            }
-            break;
-            default: std::cout << "unexpected char" << std::endl; exit(1);
-        }
-        w *= 10;
-    }
-    return num;
-}
-
-
 int String::toint() const
 {
-    return to_integer<int>(*this);
+    return to_integer<int>();
 }
 
 
 long String::tolong() const
 {
-    return to_integer<long>(*this);
+    return to_integer<long>();
 }
 
 
 long long String::tolonglong() const
 {
-    return to_integer<long long>(*this);
+    return to_integer<long long>();
 }
 
 
 unsigned int String::touint() const
 {
-    return to_integer<unsigned int>(*this);
+    return to_integer<unsigned int>();
 }
 
 
 unsigned long String::toulong() const
 {
-    return to_integer<unsigned long>(*this);
+    return to_integer<unsigned long>();
 }
 
 
 unsigned long long String::toulonglong() const
 {
-    return to_integer<unsigned long long>(*this);
-}
-
-
-template<class T>
-T to_float(const String& s)
-{
-    auto vec = s.split('.');
-    if(vec.size() == 0)
-        return to_integer<T>(s);
-    else if(vec.size() != 2)
-        exit(1);
-
-    auto a = to_integer<T>(vec[0]);
-    T b = 0;
-    T w = vec[0][0] != '-' ? static_cast<T>(0.1) : static_cast<T>(-0.1);
-
-    for(auto c = vec[1]._data(); c != vec[1]._data() + vec[1].length(); c++)
-    {
-        switch(*c)
-        {
-            case '0': break;
-            case '1': b += w; break;
-            case '2': b += w * 2; break;
-            case '3': b += w * 3; break;
-            case '4': b += w * 4; break;
-            case '5': b += w * 5; break;
-            case '6': b += w * 6; break;
-            case '7': b += w * 7; break;
-            case '8': b += w * 8; break;
-            case '9': b += w * 9; break;
-            default: std::cout << "unexpected char" << std::endl; exit(1);
-        }
-        w *= static_cast<T>(0.1);
-    }
-    return a + b;
+    return to_integer<unsigned long long>();
 }
 
 
 float String::tofloat() const
 {
-    return to_float<float>(*this);
+    return to_float<float>();
 }
 
 
 double String::todouble() const
 {
-    return to_float<double>(*this);
+    return to_float<double>();
 }
 
 
-String istring::operator+(const char* s1, const String& s2)
+String istring::operator+(const String& s1, const String& s2)
 {
-    auto _s = String(s1);
-    return s2 + _s;
+    auto _s = new char[s1._length + s2._length + 1]{'\0'};
+    strcpy_s(_s, s1._length + s2._length + 1, s1._str);
+    strcat_s(_s, s1._length + s2._length + 1, s2._str);
+    return String(_s);
 }
 
 
