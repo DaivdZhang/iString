@@ -6,8 +6,11 @@
 
 #define CHECK_MEM_ALLOC(ptr) do{\
                                 if(!ptr){\
-                                    std::cout << "Failed to allocate memory!" << std::endl;\
-                                    exit(14);\
+                                    std::cerr << "String object at " << this << std::endl;\
+                                    std::cerr << "function: " << __FUNCTION__ << std::endl;\
+                                    std::cerr << "Failed to allocate memory!"<< std::endl;\
+                                    std::cerr << "file: " << __FILE__ <<', ';\
+                                    std::cerr << "line: " << __LINE__ << std::endl;\
                                 }\
                              }while(0);
 

@@ -1,4 +1,3 @@
-#include <iostream>
 #include "istring.h"
 
 using namespace istring;
@@ -9,6 +8,7 @@ String::String()
 {
     _length = 0;
     _str = new char[1]{'\0'};
+    CHECK_MEM_ALLOC(_str);
 }
 
 
@@ -16,6 +16,7 @@ String::String(const char c)
 {
     _length = 1;
     _str = new char[2]{c};
+    CHECK_MEM_ALLOC(_str);
     _str[1] = '\0';
 }
 
@@ -24,6 +25,7 @@ String::String(const char* s)
 {
     _length = strlen(s);
     _str = new char[_length + 1];
+    CHECK_MEM_ALLOC(_str);
     strcpy_s(_str, _length + 1, s);
 }
 
@@ -32,6 +34,7 @@ String::String(const String& s)
 {
     _length = s._length;
     _str = new char[_length + 1];
+    CHECK_MEM_ALLOC(_str);
     strcpy_s(_str, _length + 1, s._str);
 }
 
@@ -82,6 +85,7 @@ String& String::operator=(const String& s)
             delete[] _str;
 
         _str = new char[_length + 1];
+        CHECK_MEM_ALLOC(_str);
         strcpy_s(_str, _length + 1, s._str);
     }
     return *this;
@@ -152,6 +156,8 @@ String String::operator*(const size_t n) const
 String& istring::String::operator+=(const String& s)
 {
     auto new_str = new char[_length + s._length + 1]{'\0'};
+    new_str = nullptr;
+    CHECK_MEM_ALLOC(new_str);
     strcpy_s(new_str, _length + s._length + 1, _str);
     strcat_s(new_str, _length + s._length + 1, s._str);
     
